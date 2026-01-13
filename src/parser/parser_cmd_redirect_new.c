@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser_cmd_redirect_new.c                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jotong <jotong@student.42singapore.sg>     +#+  +:+       +#+        */
+/*   By: ksng <ksng@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 16:54:39 by ksng              #+#    #+#             */
-/*   Updated: 2026/01/07 23:00:11 by jotong           ###   ########.fr       */
+/*   Updated: 2026/01/13 19:57:25 by ksng             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #include "libft.h"
 
 //parse_command
+
 
 t_ast *parser_word(t_parser *p)
 {
@@ -51,7 +52,7 @@ t_ast	*parse_command(t_parser *p, t_shell *shell)
 	if (match(p, T_OPEN_BRACKET))
 	{
 		advance(p);
-		node = parse_and(p, shell);
+		node = parse_logical(p, shell);
 		if (!node)
 			return (NULL);
 		if (!expect(p, T_CLOSE_BRACKET))
@@ -99,45 +100,6 @@ char	*strip_quotes(const char *str, int *flag)
 	return (result);
 }
 
-// t_ast *parse_one_redir(t_parser *p, t_ast *cmd, t_shell *shell)
-// {
-// 	t_token		*redir_token;
-// 	t_token		*file_token;
-// 	t_node_type redir_type;
-// 	t_ast		*node;
-// 	int flag;
-// 	int fd;
-// 	char	*old_value;
-
-// 	flag = 0;
-// 	redir_token = advance(p);
-// 	redir_type = get_redir_type(redir_token->type);
-// 	fd = redir_token->fd;
-// 	// printf("-->fd %i",fd);
-// 	file_token = expect(p, T_WORD);
-// 	if (!file_token)
-// 	{
-// 		free_ast(cmd);
-// 		return (NULL);
-// 	}
-// 	if (redir_type == N_HEREDOC)
-// 	{
-// 		old_value = file_token->value;
-// 		file_token->value = strip_quotes(file_token->value, &flag);
-// 		free(old_value);
-// 		node = create_redir_node(redir_type, file_token->value, cmd, fd);
-// 		if (node)
-// 		{
-// 			node->heredoc_content = read_heredoc_content(file_token->value);
-// 			if (!flag)
-// 				node->heredoc_content = expand_heredoc_line(node->heredoc_content, shell);
-// 				// node->heredoc_content = expand_and_replace(&(node->heredoc_content), shell);
-// 		}
-// 		return (node);
-// 	}
-// 	return (create_redir_node(redir_type, file_token->value, cmd, fd));
-// }
-
 t_ast *parse_one_redir(t_parser *p, t_ast *cmd, t_shell *shell)
 {
     t_token     *redir_token;
@@ -155,21 +117,45 @@ t_ast *parse_one_redir(t_parser *p, t_ast *cmd, t_shell *shell)
     ssize_t n;
     char    *tmp;
     struct sigaction    sa_old;
+
     flag = 0;
     if (g_sigint_received == 130)
     {
         free_ast(cmd);
         return (NULL);
     }
+
     redir_token = advance(p);
     redir_type = get_redir_type(redir_token->type);
     fd = redir_token->fd;
-    file_token = expect(p, T_WORD);
-    if (!file_token)
+
+    /* CHECK: Validate that redirect has a valid operand */
+    if (!peek(p))
     {
+        ft_putstr_fd("minishell: syntax error near unexpected token `newline'\n", 2);
+        shell->last_exit_status = 2;
         free_ast(cmd);
         return (NULL);
     }
+
+    if (is_redirection(peek(p)->type) || peek(p)->type == T_PIPE ||
+        peek(p)->type == T_AND || peek(p)->type == T_OR)
+    {
+        ft_putstr_fd("minishell: syntax error near unexpected token\n", 2);
+        shell->last_exit_status = 2;
+        free_ast(cmd);
+        return (NULL);
+    }
+
+    file_token = expect(p, T_WORD);
+    if (!file_token)
+    {
+        ft_putstr_fd("minishell: syntax error near redirect\n", 2);
+        shell->last_exit_status = 2;
+        free_ast(cmd);
+        return (NULL);
+    }
+
     if (redir_type == N_HEREDOC)
     {
         old_value = file_token->value;
@@ -235,7 +221,7 @@ t_ast *parse_one_redir(t_parser *p, t_ast *cmd, t_shell *shell)
             /* If heredoc reading was interrupted by signal, stop parsing */
             if (!node->heredoc_content && g_sigint_received)
             {
-                // free_ast(node);
+				free_ast(node);
 				cleanup_shell(shell);
                 return (NULL);
             }

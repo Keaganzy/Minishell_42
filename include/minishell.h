@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jotong <jotong@student.42.fr>              +#+  +:+       +#+        */
+/*   By: ksng <ksng@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/11 14:59:42 by jotong            #+#    #+#             */
-/*   Updated: 2026/01/11 15:01:54 by jotong           ###   ########.fr       */
+/*   Updated: 2026/01/13 17:27:55 by ksng             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-# define _POSIX_C_SOURCE 200809L 
+# define _POSIX_C_SOURCE 200809L
 
 # include <stdio.h>
 # include <stdlib.h>
@@ -220,6 +220,7 @@ t_ast			*parse(t_token *tokens, t_shell *shell);
 t_ast			*parse_and(t_parser *p, t_shell *shell);
 t_ast			*parse_command(t_parser *p, t_shell *shell);
 t_ast			*parse_one_redir(t_parser *p, t_ast *cmd, t_shell *shell);
+t_ast 			*parse_logical(t_parser *p, t_shell *shell);
 void			skip_spaces(t_parser *p);
 t_token			*peek(t_parser *p);
 t_token			*advance(t_parser *p);

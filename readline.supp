@@ -1,14 +1,21 @@
 {
-    readline
-    Memcheck:Leak
-    match-leak-kinds: reachable
-    ...
-    fun:readline
+   <readline_init>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:xmalloc
+   obj:*/libreadline.so*
 }
 {
-    history
-    Memcheck:Leak
-    match-leak-kinds: reachable
-    ...
-    fun:add_history
+   <readline_general>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   obj:*/libreadline.so*
+}
+{
+   <libc_init>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   obj:*/libc.so*
 }

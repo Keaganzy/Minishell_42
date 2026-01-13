@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipe_exec.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jotong <jotong@student.42.fr>              +#+  +:+       +#+        */
+/*   By: ksng <ksng@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 20:39:15 by ksng              #+#    #+#             */
-/*   Updated: 2026/01/11 13:57:51 by jotong           ###   ########.fr       */
+/*   Updated: 2026/01/13 17:20:59 by ksng             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,12 +21,16 @@ static int	wait_for_children(pid_t pid1, pid_t pid2)
 
 	waitpid(pid1, &status1, 0);
 	waitpid(pid2, &status2, 0);
-	if (WIFSIGNALED(status2))
+
+	/* FIX: Check right side (status2) FIRST for normal exit, then signals */
+	/* This ensures rightmost command's exit code is used, not left side SIGPIPE */
+	if (WIFEXITED(status2))
+		final_status = WEXITSTATUS(status2);
+	else if (WIFSIGNALED(status2))
 		final_status = 128 + WTERMSIG(status2);
+	/* Only check left side (status1) signals if right side didn't exit normally */
 	else if (WIFSIGNALED(status1))
 		final_status = 128 + WTERMSIG(status1);
-	else if (WIFEXITED(status2))
-		final_status = WEXITSTATUS(status2);
 	else
 		final_status = 1;
 	return (final_status);

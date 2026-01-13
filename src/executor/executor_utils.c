@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor_utils.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jotong <jotong@student.42singapore.sg>     +#+  +:+       +#+        */
+/*   By: ksng <ksng@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/19 23:15:23 by jotong            #+#    #+#             */
-/*   Updated: 2026/01/07 16:09:10 by jotong           ###   ########.fr       */
+/*   Updated: 2026/01/13 17:13:26 by ksng             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,12 +31,36 @@ char	**get_paths_from_env(char **envp)
 	return (NULL);
 }
 
+static int	is_file_descriptor(const char *str)
+{
+	if (!str || !*str)
+		return (0);
+	if (*str == '-' || *str == '+')
+		return (0);
+	while (*str)
+	{
+		if (!ft_isdigit(*str))
+			return (0);
+		str++;
+	}
+	return (1);
+}
+
 int	setup_redir_in(t_ast *node, t_shell *shell)
 {
 	int fd;
 
 	//jtfunction(filename);//
 	node->filename = expand_and_replace(&node->filename, shell);
+
+	if (node->filename && node->filename[0] == '&' && is_file_descriptor(node->filename + 1))
+	{
+		int source_fd = ft_atoi(node->filename + 1);
+		if (dup2(source_fd, node->fd) == -1)
+			return (1);
+		return (0);
+	}
+
 	fd = open(node->filename, O_RDONLY);
 	if (fd == -1)
 	{
@@ -54,6 +78,15 @@ int	setup_redir_out(t_ast *node, t_shell *shell)
 
 	//jtfunction(filename);//
 	node->filename = expand_and_replace(&node->filename, shell);
+
+	if (node->filename && is_file_descriptor(node->filename) && node->fd != 1)
+	{
+		int target_fd = ft_atoi(node->filename);
+		if (dup2(target_fd, node->fd) == -1)
+			return (1);
+		return (0);
+	}
+
 	fd = open(node->filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (fd == -1)
 	{
@@ -71,6 +104,15 @@ int	setup_redir_append(t_ast *node, t_shell *shell)
 
 	//jtfunction(filename);//
 	node->filename = expand_and_replace(&node->filename, shell);
+
+	if (node->filename && is_file_descriptor(node->filename) && node->fd != 1)
+	{
+		int target_fd = ft_atoi(node->filename);
+		if (dup2(target_fd, node->fd) == -1)
+			return (1);
+		return (0);
+	}
+
 	fd = open(node->filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
 	if (fd == -1)
 	{

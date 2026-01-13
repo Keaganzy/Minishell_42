@@ -3,71 +3,61 @@
 /*                                                        :::      ::::::::   */
 /*   parser_new.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jotong <jotong@student.42.fr>              +#+  +:+       +#+        */
+/*   By: ksng <ksng@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 15:20:42 by ksng              #+#    #+#             */
-/*   Updated: 2026/01/11 14:17:04 by jotong           ###   ########.fr       */
+/*   Updated: 2026/01/13 17:28:56 by ksng             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 #include "libft.h"
 
-static t_ast	*parse_or(t_parser *p, t_shell *shell);
 static t_ast	*parse_pipe(t_parser *p, t_shell *shell);
 static t_ast	*parse_redirection(t_parser *p, t_shell *shell);
 
-t_ast	*parse_and(t_parser *p, t_shell *shell)
+/* ========================================================================== */
+/* FIXED: parse_logical handles both && and || at same level, left-to-right  */
+/* This ensures operators have equal precedence and evaluate left-associative */
+/* ========================================================================== */
+t_ast	*parse_logical(t_parser *p, t_shell *shell)
 {
 	t_ast	*left;
 	t_ast	*right;
-
-	left = parse_or(p, shell);
-	if (!left)
-		return (NULL);
-	while (match(p, T_AND))
-	{
-		advance(p);
-		right = parse_or(p, shell);
-		if (!right)
-		{
-			free_ast(left);
-			return (NULL);
-		}
-		left = create_binary_node(N_AND, left, right);
-		if (!left)
-		{
-			free_ast(right);
-			return (NULL);
-		}
-	}
-	return (left);
-}
-
-static t_ast	*parse_or(t_parser *p, t_shell *shell)
-{
-	t_ast	*left;
-	t_ast	*right;
+	t_node_type op;
 
 	left = parse_pipe(p, shell);
 	if (!left)
 		return (NULL);
-	while (match(p, T_OR))
+
+	/* Handle both && and || in the same loop for left-to-right evaluation */
+	while (match(p, T_AND) || match(p, T_OR))
 	{
+		/* Determine which operator we have */
+		if (match(p, T_AND))
+			op = N_AND;
+		else
+			op = N_OR;
+
 		advance(p);
+
+		/* Parse the right side (just pipe level, not another logical op) */
 		right = parse_pipe(p, shell);
 		if (!right)
 		{
 			free_ast(left);
 			return (NULL);
 		}
-		left = create_binary_node(N_OR, left, right);
+
+		/* Create the node and update left for next iteration */
+		left = create_binary_node(op, left, right);
 		if (!left)
 		{
 			free_ast(right);
 			return (NULL);
 		}
 	}
+
 	return (left);
 }
 
@@ -100,18 +90,6 @@ static t_ast	*parse_pipe(t_parser *p, t_shell *shell)
 
 static t_ast *parse_redirection(t_parser *p, t_shell *shell)
 {
-	// t_ast *cmd;
-
-	// cmd = parse_command(p, shell);
-	// if (!cmd)
-	// 	return (NULL);
-	// while (peek(p) && is_redirection(peek(p)->type))
-	// {
-	// 	cmd = parse_one_redir(p, cmd, shell);
-	// 	if (!cmd)
-	// 		return (NULL);
-	// }
-	// return (cmd);
 	t_ast *cmd;
     t_ast *bottom;
 
@@ -176,7 +154,7 @@ t_ast *parse(t_token *tokens, t_shell *shell)
 	parser.current = tokens;
 	//parser.tokens = tokens; Used for error reporting later
 	skip_spaces(&parser);
-	ast = parse_and(&parser, shell);
+	ast = parse_logical(&parser, shell);
 	if (!ast)
 		return (NULL);
 	skip_spaces(&parser);
@@ -187,5 +165,21 @@ t_ast *parse(t_token *tokens, t_shell *shell)
 	}
 	return (ast);
 }
+
+/* ========================================================================== */
+/* OPERATOR PRECEDENCE STRUCTURE (CORRECT):                                  */
+/*                                                                            */
+/* parse()                                                                    */
+/*   └─ parse_logical() - handles && and || at SAME level, left-to-right     */
+/*       └─ parse_pipe() - handles | (higher precedence than && ||)          */
+/*           └─ parse_redirection() - handles >, <, >> (highest precedence)  */
+/*               └─ parse_command() - actual command                         */
+/*                                                                            */
+/* This ensures:                                                             */
+/* 1. && and || have equal precedence                                        */
+/* 2. Both are left-associative                                              */
+/* 3. "true || false && false" evaluates as "(true || false) && false"       */
+/*    which is correct: "true || false" = true, "true && false" = false      */
+/* ========================================================================== */
 
 
