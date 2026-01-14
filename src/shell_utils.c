@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   shell_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jotong <jotong@student.42.fr>              +#+  +:+       +#+        */
+/*   By: jotong <jotong@student.42singapore.sg>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 00:15:14 by jotong            #+#    #+#             */
-/*   Updated: 2026/01/11 09:28:47 by jotong           ###   ########.fr       */
+/*   Updated: 2026/01/14 20:50:51 by jotong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,4 +91,33 @@ int	setenv_value(char ***envp, const char *key, const char *value)
 	free(*envp);
 	*envp = new_env;
 	return (0);
+}
+
+void	cleanup_shell(t_shell *shell)
+{
+	int	i;
+
+	close(0);
+	close(1);
+	close(2);
+	if (shell->envp)
+	{
+		i = 0;
+		while (shell->envp[i])
+			free(shell->envp[i++]);
+		free(shell->envp);
+		shell->envp = NULL;
+	}
+	if (shell->tokens)
+	{
+		token_free_all(&shell->tokens);
+		shell->tokens = NULL;
+	}
+	if (shell->ast)
+	{
+		free_ast(shell->ast);
+		shell->ast = NULL;
+	}
+	if (shell)
+		free(shell);
 }

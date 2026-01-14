@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cmd_exec.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jotong <jotong@student.42.fr>              +#+  +:+       +#+        */
+/*   By: jotong <jotong@student.42singapore.sg>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 19:18:50 by ksng              #+#    #+#             */
-/*   Updated: 2026/01/11 14:08:03 by jotong           ###   ########.fr       */
+/*   Updated: 2026/01/14 20:29:33 by jotong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -199,8 +199,6 @@ int execute_cmd(t_ast *node, t_shell *shell)
 	int 	i;
 
 	i = 0;
-
-	fflush(stdout);
 	if (!node->argv || !node->argv[0])
 		return (0);
 

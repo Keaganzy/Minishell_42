@@ -6,7 +6,7 @@
 /*   By: jotong <jotong@student.42singapore.sg>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/14 20:02:07 by jotong            #+#    #+#             */
-/*   Updated: 2026/01/14 20:02:08 by jotong           ###   ########.fr       */
+/*   Updated: 2026/01/14 21:31:19 by jotong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,30 +90,3 @@ char	*expand_heredoc_line(char *line, t_shell *shell)
 	free(line);
 	return (expanded);
 }
-
-// char	*process_heredoc(char *delimiter, int is_quoted, t_shell *shell)
-// {
-// 	char	*line;
-// 	char	*full_content;
-// 	char	*tmp;
-
-// 	full_content = ft_strdup("");
-// 	while (1)
-// 	{
-// 		line = readline("> ");
-// 		if (!line || ft_strcmp(line, delimiter) == 0)
-// 		{
-// 			free(line);
-// 			break ;
-// 		}
-// 		// Only expand if the delimiter itself was not quoted 
-// 		if (!is_quoted)
-// 			line = expand_heredoc_line(line, shell);
-// 		tmp = ft_strjoin(full_content, line);
-// 		free(full_content);
-// 		full_content = ft_strjoin(tmp, "\n");
-// 		free(tmp);
-// 		free(line);
-// 	}
-// 	return (full_content);
-// }

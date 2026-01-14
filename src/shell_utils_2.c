@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   shell_utils_2.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jotong <jotong@student.42.fr>              +#+  +:+       +#+        */
+/*   By: jotong <jotong@student.42singapore.sg>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 17:44:57 by jotong            #+#    #+#             */
-/*   Updated: 2026/01/11 15:03:59 by jotong           ###   ########.fr       */
+/*   Updated: 2026/01/14 21:03:40 by jotong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,26 @@ char	**dup_envp(t_shell *shell, char **envp)
 	return (duped);
 }
 
+char	**realloc_ms(char **original, size_t new_size)
+{
+	char	**tmp;
+	size_t	i;
+
+	tmp = original;
+	original = malloc(sizeof(char *) * (new_size + 1));
+	if (!original)
+		return (NULL);
+	i = 0;
+	while (tmp[i] && i < new_size)
+	{
+		original[i] = tmp[i];
+		i++;
+	}
+	original[i] = NULL;
+	free(tmp);
+	return (original);
+}
+
 int	unsetenv_value(char ***envp, const char *key)
 {
 	int		i;
@@ -72,7 +92,7 @@ int	unsetenv_value(char ***envp, const char *key)
 		i++;
 	}
 	(*envp)[j] = NULL;
-	*envp = realloc(*envp, (j + 1) * sizeof(char *));
+	*envp = realloc_ms(*envp, j);
 	return (0);
 }
 
@@ -83,7 +103,7 @@ char	*getenv_value(char **env, const char *key)
 
 	if (!env || !key)
 		return (NULL);
-	len = strlen(key);
+	len = ft_strlen(key);
 	i = 0;
 	while (env[i])
 	{
@@ -92,33 +112,4 @@ char	*getenv_value(char **env, const char *key)
 		i++;
 	}
 	return (NULL);
-}
-
-void	cleanup_shell(t_shell *shell)
-{
-	int	i;
-
-	close(0);
-	close(1);
-	close(2);
-	if (shell->envp)
-	{
-		i = 0;
-		while (shell->envp[i])
-			free(shell->envp[i++]);
-		free(shell->envp);
-		shell->envp = NULL;
-	}
-	if (shell->tokens)
-	{
-		token_free_all(&shell->tokens);
-		shell->tokens = NULL;
-	}
-	if (shell->ast)
-	{
-		free_ast(shell->ast);
-		shell->ast = NULL;
-	}
-	if (shell)
-		free(shell);
 }

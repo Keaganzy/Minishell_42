@@ -6,7 +6,7 @@
 /*   By: jotong <jotong@student.42singapore.sg>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/14 20:01:59 by jotong            #+#    #+#             */
-/*   Updated: 2026/01/14 20:02:01 by jotong           ###   ########.fr       */
+/*   Updated: 2026/01/14 21:34:45 by jotong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ int	check_invalid_pipes(char *s)
 
 	i = 0;
 	s_back = ft_strlen(s);
-	while (s[i] && s[i] == ' ')
+	while (s[i] && (s[i] == ' '))
 		i++;
 	while (s[s_back] && s[s_back] == ' ')
 		s_back--;

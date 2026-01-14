@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexer_checks.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jotong <jotong@student.42.fr>              +#+  +:+       +#+        */
+/*   By: jotong <jotong@student.42singapore.sg>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/26 15:36:30 by jotong            #+#    #+#             */
-/*   Updated: 2026/01/11 09:55:28 by jotong           ###   ########.fr       */
+/*   Updated: 2026/01/14 21:38:33 by jotong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ static int	check_valid_redirs(char *s)
 	i = s_len - 1;
 	while (i > 0)
 	{
-		if (s[i] == ' ')
+		if (s[i] == ' ' || s[i] == '\t')
 			i--;
 		else if (s[i] == '>' || s[i] == '<')
 			return (0);
@@ -35,7 +35,7 @@ static int	check_valid_redirs(char *s)
 
 int	check_syntax(char *s)
 {
-	if (!s || !*s || (ft_strlen(s) == 1 && *s == ' '))
+	if (!s || !*s || (ft_strlen(s) == 1 && (*s == ' ' || *s == '\t')))
 		return (0);
 	if (check_has_equals(s) == 0)
 		return (0);
