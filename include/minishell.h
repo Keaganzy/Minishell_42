@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ksng <ksng@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: jotong <jotong@student.42singapore.sg>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/11 14:59:42 by jotong            #+#    #+#             */
-/*   Updated: 2026/01/13 17:27:55 by ksng             ###   ########.fr       */
+/*   Updated: 2026/01/14 20:07:36 by jotong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -220,7 +220,7 @@ t_ast			*parse(t_token *tokens, t_shell *shell);
 t_ast			*parse_and(t_parser *p, t_shell *shell);
 t_ast			*parse_command(t_parser *p, t_shell *shell);
 t_ast			*parse_one_redir(t_parser *p, t_ast *cmd, t_shell *shell);
-t_ast 			*parse_logical(t_parser *p, t_shell *shell);
+t_ast			*parse_logical(t_parser *p, t_shell *shell);
 void			skip_spaces(t_parser *p);
 t_token			*peek(t_parser *p);
 t_token			*advance(t_parser *p);
