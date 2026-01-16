@@ -6,7 +6,7 @@
 /*   By: jotong <jotong@student.42singapore.sg>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 20:39:15 by ksng              #+#    #+#             */
-/*   Updated: 2026/01/16 10:26:38 by jotong           ###   ########.fr       */
+/*   Updated: 2026/01/16 11:19:12 by jotong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ static int	wait_for_children(pid_t pid1, pid_t pid2)
 {
 	int	status1;
 	int	status2;
-	int final_status;
+	int	final_status;
 
 	waitpid(pid1, &status1, 0);
 	waitpid(pid2, &status2, 0);
@@ -39,7 +39,6 @@ static int	execute_pipe_child(t_ast *node, int *pipefd, t_shell *shell,
 
 	signal(SIGINT, SIG_DFL);
 	signal(SIGQUIT, SIG_DFL);
-
 	if (is_left)
 	{
 		close(pipefd[0]);

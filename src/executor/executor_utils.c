@@ -6,7 +6,7 @@
 /*   By: jotong <jotong@student.42singapore.sg>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/19 23:15:23 by jotong            #+#    #+#             */
-/*   Updated: 2026/01/16 10:25:43 by jotong           ###   ########.fr       */
+/*   Updated: 2026/01/16 11:03:10 by jotong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,6 @@ int	setup_redir_in(t_ast *node, t_shell *shell)
 {
 	int fd;
 
-	//jtfunction(filename);//
 	node->filename = expand_and_replace(&node->filename, shell);
 
 	if (node->filename && node->filename[0] == '&' && is_file_descriptor(node->filename + 1))
@@ -60,7 +59,6 @@ int	setup_redir_in(t_ast *node, t_shell *shell)
 			return (1);
 		return (0);
 	}
-
 	fd = open(node->filename, O_RDONLY);
 	if (fd == -1)
 	{
@@ -77,7 +75,6 @@ int	setup_redir_out(t_ast *node, t_shell *shell)
 	int fd;
 
 	node->filename = expand_and_replace(&node->filename, shell);
-
 	if (node->filename && is_file_descriptor(node->filename) && node->fd != 1)
 	{
 		int target_fd = ft_atoi(node->filename);
@@ -101,7 +98,6 @@ int	setup_redir_append(t_ast *node, t_shell *shell)
 	int fd;
 
 	node->filename = expand_and_replace(&node->filename, shell);
-
 	if (node->filename && is_file_descriptor(node->filename) && node->fd != 1)
 	{
 		int target_fd = ft_atoi(node->filename);
@@ -127,7 +123,6 @@ int	setup_heredoc(t_ast *node, t_shell *shell)
 	(void)shell;
 	if (!node->heredoc_content)
 		return (1);
-
 	if (pipe(pipefd) == -1)
 		return (1);
 	write(pipefd[1], node->heredoc_content, ft_strlen(node->heredoc_content));
