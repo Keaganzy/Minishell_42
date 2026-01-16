@@ -48,10 +48,21 @@ int	add_dir_match(char **matches, int *count, char *dname, char *name)
 	free(tmp);
 	if (!full_fname)
 		return (0);
-	matches[*count] = ft_strdup(full_fname);
-	if (!matches[*count])
-		return (0);
+	matches[*count] = full_fname;
 	(*count)++;
+	return (1);
+}
+
+static int	should_add_entry(struct dirent *entry, char *pattern)
+{
+	if (ft_strcmp(entry->d_name, ".") == 0)
+		return (0);
+	if (ft_strcmp(entry->d_name, "..") == 0)
+		return (0);
+	if (entry->d_name[0] == '.' && pattern[0] != '.')
+		return (0);
+	if (!match_pattern(entry->d_name, pattern))
+		return (0);
 	return (1);
 }
 
@@ -72,10 +83,7 @@ char	**get_matches(char *pattern)
 	entry = readdir(dir);
 	while (entry)
 	{
-		if (ft_strcmp(entry->d_name, ".") != 0
-			&& ft_strcmp(entry->d_name, "..") != 0
-			&& !(entry->d_name[0] == '.' && pattern[0] != '.')
-			&& match_pattern(entry->d_name, pattern))
+		if (should_add_entry(entry, pattern))
 			add_match(matches, &count, entry->d_name);
 		entry = readdir(dir);
 	}
@@ -86,29 +94,4 @@ char	**get_matches(char *pattern)
 	return (matches);
 }
 
-char	*join_matches(char **matches)
-{
-	char	*result;
-	char	*tmp;
-	int		i;
-
-	result = ft_strdup(matches[0]);
-	if (!result)
-		return (NULL);
-	i = 1;
-	while (matches[i])
-	{
-		tmp = result;
-		result = ft_strjoin(result, " ");
-		free(tmp);
-		if (!result)
-			return (NULL);
-		tmp = result;
-		result = ft_strjoin(result, matches[i]);
-		free(tmp);
-		if (!result)
-			return (NULL);
-		i++;
-	}
-	return (result);
-}
+//continue 10;

@@ -14,7 +14,6 @@
 #include "libft.h"
 
 static t_ast	*parse_pipe(t_parser *p, t_shell *shell);
-static t_ast	*parse_redirection(t_parser *p, t_shell *shell);
 
 t_ast	*parse_logical(t_parser *p, t_shell *shell)
 {
@@ -63,17 +62,7 @@ static t_ast	*parse_pipe(t_parser *p, t_shell *shell)
 	return (left);
 }
 
-static t_ast	*find_bottom_left(t_ast *cmd)
-{
-	t_ast	*bottom;
-
-	bottom = cmd;
-	while (bottom->left)
-		bottom = bottom->left;
-	return (bottom);
-}
-
-static t_ast	*parse_prefix_redirections(t_parser *p, t_shell *shell)
+t_ast	*parse_prefix_redirections(t_parser *p, t_shell *shell)
 {
 	t_ast	*cmd;
 
@@ -87,44 +76,8 @@ static t_ast	*parse_prefix_redirections(t_parser *p, t_shell *shell)
 	return (cmd);
 }
 
-static t_ast	*attach_command_to_redir(t_parser *p, t_ast *cmd,
+t_ast	*parse_suffix_redirections(t_parser *p, t_ast *cmd,
 				t_shell *shell)
-{
-	t_ast	*bottom;
-	t_ast	*parsed_cmd;
-
-	bottom = find_bottom_left(cmd);
-	parsed_cmd = parse_command(p, shell);
-	if (!parsed_cmd)
-		return (free_ast(cmd), NULL);
-	bottom->left = parsed_cmd;
-	return (cmd);
-}
-
-static t_ast	*handle_command_parse(t_parser *p, t_ast *cmd, t_shell *shell)
-{
-	if (cmd)
-		return (attach_command_to_redir(p, cmd, shell));
-	else
-	{
-		cmd = parse_command(p, shell);
-		if (!cmd)
-			return (NULL);
-		return (cmd);
-	}
-}
-
-static t_ast	*handle_no_command(t_ast *cmd, t_shell *shell)
-{
-	free_ast(cmd);
-	ft_putstr_fd(
-		"minishell: syntax error near unexpected token `newline'\n", 2);
-	shell->last_exit_status = 2;
-	return (NULL);
-}
-
-static t_ast	*parse_suffix_redirections(t_parser *p, t_ast *cmd,
-					t_shell *shell)
 {
 	while (peek(p) && is_redirection(peek(p)->type))
 	{
@@ -132,23 +85,6 @@ static t_ast	*parse_suffix_redirections(t_parser *p, t_ast *cmd,
 		if (!cmd)
 			return (NULL);
 	}
-	return (cmd);
-}
-
-static t_ast	*parse_redirection(t_parser *p, t_shell *shell)
-{
-	t_ast	*cmd;
-
-	cmd = parse_prefix_redirections(p, shell);
-	if (peek(p) && (match(p, T_WORD) || match(p, T_OPEN_BRACKET)))
-	{
-		cmd = handle_command_parse(p, cmd, shell);
-		if (!cmd)
-			return (NULL);
-	}
-	else if (!cmd)
-		return (handle_no_command(cmd, shell));
-	cmd = parse_suffix_redirections(p, cmd, shell);
 	return (cmd);
 }
 

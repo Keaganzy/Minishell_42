@@ -41,29 +41,20 @@ int	execute_builtin(t_ast *ast, t_shell *shell)
 {
 	char	*cmd;
 	int		arg_len;
+	int		result;
 
 	if (!ast || !ast->argv || !ast->argv[0])
 		return (1);
 	cmd = ast->argv[0];
 	arg_len = ft_strlen(cmd);
-	if (ft_strncmp(cmd, "cd", arg_len) == 0 && ft_strlen(ast->argv[0]) == 2)
-		return (builtin_cd(ast->argv, shell));
-	else if (ft_strncmp(cmd, "echo", arg_len) == 0 && ft_strlen(ast->argv[0]) == 4)
-		return (ft_echo(ast->argv, shell));
-	else if (ft_strncmp(cmd, "env", arg_len) == 0 && ft_strlen(ast->argv[0]) == 3)
-		return (ft_env(ast->argv, shell));
-	else if (ft_strncmp(cmd, "pwd", arg_len) == 0 && ft_strlen(ast->argv[0]) == 3)
-		return (ft_pwd(ast->argv, shell));
-	else if (ft_strncmp(cmd, "exit", arg_len) == 0 && ft_strlen(ast->argv[0]) == 4)
-		return (ft_exit(ast->argv, shell));
-	else if (ft_strncmp(cmd, "export", arg_len) == 0 && ft_strlen(ast->argv[0]) == 6)
-		return (ft_export(ast->argv, shell));
-	else if (ft_strncmp(cmd, "unset", arg_len) == 0 && ft_strlen(ast->argv[0]) == 5)
-		return (ft_unset(ast->argv, shell));
-	return (-100);
+	result = exec_builtin_part1(cmd, arg_len, ast, shell);
+	if (result != -100)
+		return (result);
+	result = exec_builtin_part2(cmd, arg_len, ast, shell);
+	return (result);
 }
 
-static char	*find_command_path(char *cmd, char **envp)
+char	*find_command_path(char *cmd, char **envp)
 {
 	char	**paths;
 	char	*full_path;
@@ -90,48 +81,19 @@ static char	*find_command_path(char *cmd, char **envp)
 	return (NULL);
 }
 
-static int	execute_external(t_ast *ast, t_shell *shell)
+int	execute_external(t_ast *ast, t_shell *shell)
 {
 	pid_t	pid;
 	int		status;
-	char	*cmd_path;
-	int		sig;
 
 	status = 0;
 	pid = fork();
 	if (pid == -1)
 		return (1);
 	if (pid == 0)
-	{
-		signal(SIGINT, SIG_DFL);
-		signal(SIGQUIT, SIG_DFL);
-		cmd_path = find_command_path(ast->argv[0], shell->envp);
-		if (!cmd_path)
-		{
-			ft_putstr_fd(ast->argv[0], 2);
-			ft_putstr_fd(": command not found\n", 2);
-			cleanup_shell(shell);
-			exit(127);
-		}
-		execve(cmd_path, ast->argv, shell->envp);
-		perror(ast->argv[0]);
-		free(cmd_path);
-		cleanup_shell(shell);
-		exit(126);
-	}
+		execute_external_child(ast, shell);
 	waitpid(pid, &status, 0);
-	if (WIFEXITED(status))
-		return (WEXITSTATUS(status));
-	else if (WIFSIGNALED(status))
-	{
-		sig = WTERMSIG(status);
-		if (sig == SIGINT)
-			return (130);
-		if (sig == 3)
-			write(1, "(Core Dumped)\n", 15);
-		return (128 + sig);
-	}
-	return (1);
+	return (handle_wait_status(status));
 }
 
 int	execute_cmd(t_ast *node, t_shell *shell)

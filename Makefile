@@ -30,6 +30,11 @@ PARSER_FILES	= $(SRC_DIR)/$(PARSER_DIR)/parser_new.c \
 					$(SRC_DIR)/$(PARSER_DIR)/parser_utils_new.c \
 					$(SRC_DIR)/$(PARSER_DIR)/parser_cmd_redirect_new.c \
 					$(SRC_DIR)/$(PARSER_DIR)/parser_cmd_redirect_utils_new.c \
+					$(SRC_DIR)/$(PARSER_DIR)/parser_cmd_redirect_utils_1.c \
+					$(SRC_DIR)/$(PARSER_DIR)/parser_cmd_redirect_1.c \
+					$(SRC_DIR)/$(PARSER_DIR)/parser_heredoc.c \
+					$(SRC_DIR)/$(PARSER_DIR)/parser_one_redirect.c \
+					$(SRC_DIR)/$(PARSER_DIR)/parser_helper.c \
 					$(SRC_DIR)/$(PARSER_DIR)/parser_node_utils_new.c
 LEXER_FILES		= $(SRC_DIR)/$(LEXER_DIR)/lexer.c \
 					$(SRC_DIR)/$(LEXER_DIR)/lexer_checks.c \
@@ -56,12 +61,20 @@ EXECUTOR_FILES	= $(SRC_DIR)/$(EXECUTOR_DIR)/executor.c \
 					$(SRC_DIR)/$(EXECUTOR_DIR)/executor_utils.c \
 					$(SRC_DIR)/$(EXECUTOR_DIR)/executor_utils2.c \
 					$(SRC_DIR)/$(EXECUTOR_DIR)/cmd_exec.c \
+					$(SRC_DIR)/$(EXECUTOR_DIR)/cmd_exec_helper.c \
 					$(SRC_DIR)/$(EXECUTOR_DIR)/pipe_exec.c \
 					$(SRC_DIR)/$(EXECUTOR_DIR)/redir_exec.c \
 					$(SRC_DIR)/$(EXECUTOR_DIR)/logical_exec.c \
 					$(SRC_DIR)/$(EXECUTOR_DIR)/strip_expand.c \
 					$(SRC_DIR)/$(EXECUTOR_DIR)/strip_expand2.c \
-					$(SRC_DIR)/$(EXECUTOR_DIR)/strip_expand3.c
+					$(SRC_DIR)/$(EXECUTOR_DIR)/strip_expand3.c \
+					$(SRC_DIR)/$(EXECUTOR_DIR)/strip_expand4.c \
+					$(SRC_DIR)/$(EXECUTOR_DIR)/strip_expand5.c \
+					$(SRC_DIR)/$(EXECUTOR_DIR)/strip_expand6.c \
+					$(SRC_DIR)/$(EXECUTOR_DIR)/strip_expand7.c \
+					$(SRC_DIR)/$(EXECUTOR_DIR)/strip_expand8.c \
+					$(SRC_DIR)/$(EXECUTOR_DIR)/strip_expand9.c \
+					$(SRC_DIR)/$(EXECUTOR_DIR)/strip_expand10.c
 REQ_SRC			:= $(SRC_DIR)/main.c $(SRC_DIR)/signals.c \
 					$(SRC_DIR)/shell_utils.c $(SRC_DIR)/shell_utils_2.c \
 					$(SRC_DIR)/cleanup_utils.c \
