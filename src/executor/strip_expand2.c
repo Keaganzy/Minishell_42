@@ -6,7 +6,7 @@
 /*   By: jotong <jotong@student.42singapore.sg>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/07 16:38:28 by jotong            #+#    #+#             */
-/*   Updated: 2026/01/16 10:29:22 by jotong           ###   ########.fr       */
+/*   Updated: 2026/01/16 11:22:03 by jotong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -351,7 +351,6 @@ static int exp_var(char **s, t_exp *e, t_shell *shell)
 			e->map[e->i++] = e->state.in_double;
 		}
 	}
-
 	if (len == 1 && (*name == '?' || *name == '0'))
 		free(value);
 	free(name);
@@ -370,7 +369,8 @@ static int process_char(char **s, t_exp *e, t_shell *shell)
 	else if (**s == '$' && !e->state.in_single && *(*s + 1))
 		return (exp_var(s, e, shell));
 	else
-		return (e->out[e->i] = **s, e->map[e->i++] = (e->state.in_single || e->state.in_double), (*s)++, 1);
+		return (e->out[e->i] = **s, e->map[e->i++] = (e->state.in_single
+				|| e->state.in_double), (*s)++, 1);
 }
 
 static char *expand_strip(char *s, t_shell *shell, char **map_out)
