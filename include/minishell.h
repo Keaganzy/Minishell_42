@@ -6,7 +6,7 @@
 /*   By: jotong <jotong@student.42singapore.sg>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/11 14:59:42 by jotong            #+#    #+#             */
-/*   Updated: 2026/01/14 21:37:15 by jotong           ###   ########.fr       */
+/*   Updated: 2026/01/16 13:26:14 by jotong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -182,6 +182,17 @@ int				execute_logical(t_ast *node, t_shell *shell);
 int				setup_redirections(t_ast *node, t_shell *shell);
 char			**get_paths_from_env(char **envp);
 char			*expand_and_replace(char **s, t_shell *shell);
+int				is_file_descriptor(const char *str);
+int				match_recursive(char *str, char *pat);
+char			*get_home_dir(t_shell *shell);
+char			*get_env_value(char *var_name, t_shell *shell);
+size_t			get_var_len(char *s);
+void			init_quote_state(t_quote_state *state);
+char			**get_matches(char *pattern);
+int				add_dir_match(char **matches, int *count, char *dname, char *name);
+int				add_match(char **matches, int *count, char *name);
+int				match_pattern(char *str, char *pattern);
+char			*join_matches(char **matches);
 
 /* Builtins Module */
 void			free_substr(char **substr);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jotong <jotong@student.42.fr>              +#+  +:+       +#+        */
+/*   By: jotong <jotong@student.42singapore.sg>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 19:03:59 by ksng              #+#    #+#             */
-/*   Updated: 2026/01/11 14:08:52 by jotong           ###   ########.fr       */
+/*   Updated: 2026/01/16 13:03:55 by jotong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,9 +29,9 @@ int	execute_node(t_ast *node, t_shell *shell)
 	return (1);
 }
 
-int execute_ast(t_ast *root, t_shell *shell)
+int	execute_ast(t_ast *root, t_shell *shell)
 {
-	int status;
+	int	status;
 
 	if (!root)
 		return (0);

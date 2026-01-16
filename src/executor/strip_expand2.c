@@ -6,7 +6,7 @@
 /*   By: jotong <jotong@student.42singapore.sg>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/07 16:38:28 by jotong            #+#    #+#             */
-/*   Updated: 2026/01/16 11:22:03 by jotong           ###   ########.fr       */
+/*   Updated: 2026/01/16 13:26:00 by jotong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,156 +14,12 @@
 #include <dirent.h>
 #include "libft.h"
 
-static void init_quote_state(t_quote_state *state)
+static char	**get_matches_in_dir(char *dname, char *pattern)
 {
-	state->in_single = 0;
-	state->in_double = 0;
-	state->in_curly_brackets = 0;
-	state->flag = 0;
-}
-
-static size_t get_var_len(char *s)
-{
-	size_t len;
-
-	len = 0;
-	if (s[len] == '?' || (s[len] >= '0' && s[len] <= '9'))
-		return (1);
-	while (s[len] && (ft_isalnum(s[len]) || s[len] == '_'))
-		len++;
-	return (len);
-}
-
-static char *get_env_value(char *var_name, t_shell *shell)
-{
-	int i;
-	size_t len;
-
-	if (!var_name || !shell->envp)
-		return (NULL);
-	len = ft_strlen(var_name);
-	if (len == 1 && *var_name == '?')
-		return (ft_itoa(shell->last_exit_status));
-	if (len == 1 && *var_name == '0')
-		return (ft_strdup("minishell"));
-	i = 0;
-	while (shell->envp[i])
-	{
-		if (ft_strncmp(shell->envp[i], var_name, len) == 0 && shell->envp[i][len] == '=')
-			return (shell->envp[i] + len + 1);
-		i++;
-	}
-	return (NULL);
-}
-
-static char *get_home_dir(t_shell *shell)
-{
-	char *home;
-
-	home = get_env_value("HOME", shell);
-	if (!home)
-		return ("/tmp");
-	return (home);
-}
-
-static int match_recursive(char *str, char *pat)
-{
-	if (!*pat)
-		return (!*str);
-	if (*pat == '*')
-	{
-		while (*pat == '*')
-			pat++;
-		if (!*pat)
-			return (1);
-		while (*str)
-		{
-			if (match_recursive(str, pat))
-				return (1);
-			str++;
-		}
-		return (0);
-	}
-	if (*str && (*str == *pat || *pat == '?'))
-		return (match_recursive(str + 1, pat + 1));
-	return (0);
-}
-
-int match_pattern(char *str, char *pattern)
-{
-	if (ft_strcmp(str, ".") == 0 || ft_strcmp(str, "..") == 0)
-		return (0);
-	if (str[0] == '.' && pattern[0] != '.')
-		return (0);
-	return (match_recursive(str, pattern));
-}
-
-static int add_match(char **matches, int *count, char *name)
-{
-	if (*count >= 1023)
-		return (0);
-	matches[*count] = ft_strdup(name);
-	if (!matches[*count])
-		return (0);
-	(*count)++;
-	return (1);
-}
-
-static int add_dir_match(char **matches, int *count, char *dname, char *name)
-{
-	char *full_fname;
-	char *tmp;
-
-	if (*count >= 1023)
-		return (0);
-	tmp = ft_strjoin(dname, "/");
-	if (!tmp)
-		return (0);
-	full_fname = ft_strjoin(tmp, name);
-	free(tmp);
-	if (!full_fname)
-		return (0);
-	matches[*count] = ft_strdup(full_fname);
-	if (!matches[*count])
-		return (0);
-	(*count)++;
-	return (1);
-}
-
-static char **get_matches(char *pattern)
-{
-	DIR *dir;
-	struct dirent *entry;
-	char **matches;
-	int count;
-
-	dir = opendir(".");
-	if (!dir)
-		return (NULL);
-	matches = malloc(sizeof(char *) * 1024);
-	if (!matches)
-		return (closedir(dir), NULL);
-	count = 0;
-	entry = readdir(dir);
-	while (entry)
-	{
-		if (ft_strcmp(entry->d_name, ".") != 0 && ft_strcmp(entry->d_name, "..") != 0 && !(entry->d_name[0] == '.' && pattern[0] != '.') && match_pattern(entry->d_name, pattern))
-			add_match(matches, &count, entry->d_name);
-		entry = readdir(dir);
-	}
-	matches[count] = NULL;
-	closedir(dir);
-	if (count == 0)
-		return (free(matches), NULL);
-	return (matches);
-}
-
-static char **get_matches_in_dir(char *dname, char *pattern)
-{
-	DIR *dir;
-	struct dirent *entry;
-	char **matches;
-	int count;
+	DIR				*dir;
+	struct dirent	*entry;
+	char			**matches;
+	int				count;
 
 	dir = opendir(dname);
 	if (!dir)
@@ -175,7 +31,10 @@ static char **get_matches_in_dir(char *dname, char *pattern)
 	entry = readdir(dir);
 	while (entry)
 	{
-		if (ft_strcmp(entry->d_name, ".") != 0 && ft_strcmp(entry->d_name, "..") != 0 && !(entry->d_name[0] == '.' && pattern[0] != '.') && match_pattern(entry->d_name, pattern))
+		if (ft_strcmp(entry->d_name, ".") != 0
+			&& ft_strcmp(entry->d_name, "..") != 0
+			&& !(entry->d_name[0] == '.' && pattern[0] != '.')
+			&& match_pattern(entry->d_name, pattern))
 			add_dir_match(matches, &count, dname, entry->d_name);
 		entry = readdir(dir);
 	}
@@ -186,9 +45,9 @@ static char **get_matches_in_dir(char *dname, char *pattern)
 	return (matches);
 }
 
-static void free_matches(char **matches)
+static void	free_matches(char **matches)
 {
-	int i;
+	int	i;
 
 	if (!matches)
 		return;
@@ -198,38 +57,11 @@ static void free_matches(char **matches)
 	free(matches);
 }
 
-static char *join_matches(char **matches)
+static size_t	calc_var_len_helper(char *s, t_shell *shell, int *need_free)
 {
-	char *result;
-	char *tmp;
-	int i;
-
-	result = ft_strdup(matches[0]);
-	if (!result)
-		return (NULL);
-	i = 1;
-	while (matches[i])
-	{
-		tmp = result;
-		result = ft_strjoin(result, " ");
-		free(tmp);
-		if (!result)
-			return (NULL);
-		tmp = result;
-		result = ft_strjoin(result, matches[i]);
-		free(tmp);
-		if (!result)
-			return (NULL);
-		i++;
-	}
-	return (result);
-}
-
-static size_t calc_var_len_helper(char *s, t_shell *shell, int *need_free)
-{
-	size_t len;
-	char *name;
-	char *value;
+	size_t	len;
+	char	*name;
+	char	*value;
 
 	len = get_var_len(s);
 	if (len == 0)
@@ -251,12 +83,12 @@ static size_t calc_var_len_helper(char *s, t_shell *shell, int *need_free)
 	return (len);
 }
 
-static size_t calc_len(char *s, t_shell *shell)
+static size_t	calc_len(char *s, t_shell *shell)
 {
-	size_t len;
-	t_quote_state state;
-	char *start;
-	int need_free;
+	size_t			len;
+	t_quote_state	state;
+	char			*start;
+	int				need_free;
 
 	start = s;
 	len = 0;
@@ -273,7 +105,8 @@ static size_t calc_len(char *s, t_shell *shell)
 			state.in_double = !state.in_double;
 			s++;
 		}
-		else if (*s == '~' && !state.in_single && !state.in_double && (s == start || *(s - 1) == ' '))
+		else if (*s == '~' && !state.in_single && !state.in_double
+				&& (s == start || *(s - 1) == ' '))
 		{
 			len += ft_strlen(get_home_dir(shell));
 			s++;
@@ -293,11 +126,11 @@ static size_t calc_len(char *s, t_shell *shell)
 	return (len);
 }
 
-static int exp_tilde(char **s, t_exp *e, t_shell *shell)
+static int	exp_tilde(char **s, t_exp *e, t_shell *shell)
 {
-	char *home;
-	int is_quoted;
-	size_t j;
+	char	*home;
+	int		is_quoted;
+	size_t	j;
 
 	home = get_home_dir(shell);
 	is_quoted = (e->state.in_single || e->state.in_double);
@@ -311,12 +144,12 @@ static int exp_tilde(char **s, t_exp *e, t_shell *shell)
 	return (1);
 }
 
-static int exp_var(char **s, t_exp *e, t_shell *shell)
+static int	exp_var(char **s, t_exp *e, t_shell *shell)
 {
-	char *name;
-	char *value;
-	size_t len;
-	size_t j;
+	char	*name;
+	char	*value;
+	size_t	len;
+	size_t	j;
 
 	(*s)++;
 	len = get_var_len(*s);
@@ -358,7 +191,7 @@ static int exp_var(char **s, t_exp *e, t_shell *shell)
 	return (1);
 }
 
-static int process_char(char **s, t_exp *e, t_shell *shell)
+static int	process_char(char **s, t_exp *e, t_shell *shell)
 {
 	if (**s == '\'' && !e->state.in_double)
 		return (e->state.in_single = !e->state.in_single, (*s)++, 1);
@@ -373,10 +206,10 @@ static int process_char(char **s, t_exp *e, t_shell *shell)
 				|| e->state.in_double), (*s)++, 1);
 }
 
-static char *expand_strip(char *s, t_shell *shell, char **map_out)
+static char	*expand_strip(char *s, t_shell *shell, char **map_out)
 {
-	t_exp e;
-	size_t len;
+	t_exp	e;
+	size_t	len;
 
 	len = calc_len(s, shell);
 	e.out = malloc(len + 1);
@@ -394,11 +227,11 @@ static char *expand_strip(char *s, t_shell *shell, char **map_out)
 	return (e.out);
 }
 
-static size_t calc_split_len(char *s, char *map)
+static size_t	calc_split_len(char *s, char *map)
 {
-	size_t len;
-	int i;
-	int prev_was_space;
+	size_t	len;
+	int		i;
+	int		prev_was_space;
 
 	len = 0;
 	prev_was_space = 1;
@@ -425,13 +258,13 @@ static size_t calc_split_len(char *s, char *map)
 	return (len);
 }
 
-static char *split_words(char *s, char *map)
+static char	*split_words(char *s, char *map)
 {
-	char *result;
-	size_t len;
-	int i;
-	int j;
-	int prev_was_sep;
+	char	*result;
+	size_t	len;
+	int		i;
+	int		j;
+	int		prev_was_sep;
 
 	len = calc_split_len(s, map);
 	result = malloc(len + 1);
@@ -461,7 +294,7 @@ static char *split_words(char *s, char *map)
 	return (result);
 }
 
-static int has_wildcard(char *s, char *map, int start, int end)
+static int	has_wildcard(char *s, char *map, int start, int end)
 {
 	while (start < end)
 	{
@@ -472,18 +305,18 @@ static int has_wildcard(char *s, char *map, int start, int end)
 	return (0);
 }
 
-static int word_end(char *s, int i)
+static int	word_end(char *s, int i)
 {
 	while (s[i] && !is_space(s[i]))
 		i++;
 	return (i);
 }
 
-static char *trim_pattern(char *pattern)
+static char	*trim_pattern(char *pattern)
 {
-	char *start;
-	char *end;
-	size_t len;
+	char	*start;
+	char	*end;
+	size_t	len;
 
 	start = pattern;
 	while (*start && is_space(*start))
@@ -497,12 +330,12 @@ static char *trim_pattern(char *pattern)
 	return (ft_substr(start, 0, len));
 }
 
-static char *expand_pattern(char *pattern)
+static char	*expand_pattern(char *pattern)
 {
-	char **matches;
-	char *result;
-	char *trimmed;
-	char *dir_name;
+	char	**matches;
+	char	*result;
+	char	*trimmed;
+	char	*dir_name;
 
 	trimmed = trim_pattern(pattern);
 	if (!trimmed || !*trimmed)
@@ -513,8 +346,10 @@ static char *expand_pattern(char *pattern)
 	}
 	else
 	{
-		dir_name = ft_strndup(pattern, ft_strnstr(pattern, "/", ft_strlen(pattern)) - pattern);
-		matches = get_matches_in_dir(dir_name, trimmed + ft_strlen(dir_name) + 1);
+		dir_name = ft_strndup(pattern,
+				ft_strnstr(pattern, "/", ft_strlen(pattern)) - pattern);
+		matches = get_matches_in_dir(dir_name,
+				trimmed + ft_strlen(dir_name) + 1);
 	}
 	free(trimmed);
 	if (!matches)
@@ -526,21 +361,24 @@ static char *expand_pattern(char *pattern)
 	return (result);
 }
 
-static size_t calc_wild_len(char *s, char *map)
+static size_t	calc_wild_len(char *s, char *map)
 {
-	int i;
-	int start;
-	int end;
-	char *pat;
-	char *exp;
-	size_t len;
+	int		i;
+	int		start;
+	int		end;
+	char	*pat;
+	char	*exp;
+	size_t	len;
 
 	i = 0;
 	len = 0;
 	while (s[i])
 	{
 		if (is_space(s[i]))
-			len++, i++;
+		{
+			len++;
+			i++;
+		}
 		else
 		{
 			start = i;
@@ -561,13 +399,13 @@ static size_t calc_wild_len(char *s, char *map)
 	return (len);
 }
 
-static void copy_word(char *s, char *map, int *i, char **result, int *j)
+static void	copy_word(char *s, char *map, int *i, char **result, int *j)
 {
-	int start;
-	int end;
-	char *pat;
-	char *exp;
-	int k;
+	int		start;
+	int		end;
+	char	*pat;
+	char	*exp;
+	int		k;
 
 	start = *i;
 	end = word_end(s, *i);
@@ -589,12 +427,12 @@ static void copy_word(char *s, char *map, int *i, char **result, int *j)
 	*i = end;
 }
 
-static char *expand_wild(char *s, char *map)
+static char	*expand_wild(char *s, char *map)
 {
-	char *result;
-	size_t len;
-	int i;
-	int j;
+	char	*result;
+	size_t	len;
+	int		i;
+	int		j;
 
 	len = calc_wild_len(s, map);
 	result = malloc(len + 1);
@@ -613,12 +451,12 @@ static char *expand_wild(char *s, char *map)
 	return (result);
 }
 
-char *expand_and_replace(char **s, t_shell *shell)
+char	*expand_and_replace(char **s, t_shell *shell)
 {
-	char *step1;
-	char *map;
-	char *step2;
-	char *step3;
+	char	*step1;
+	char	*map;
+	char	*step2;
+	char	*step3;
 
 	if (!s || !*s)
 		return (NULL);
