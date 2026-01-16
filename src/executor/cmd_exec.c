@@ -6,7 +6,7 @@
 /*   By: jotong <jotong@student.42singapore.sg>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 19:18:50 by ksng              #+#    #+#             */
-/*   Updated: 2026/01/14 20:29:33 by jotong           ###   ########.fr       */
+/*   Updated: 2026/01/16 10:07:43 by jotong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,59 +89,6 @@ static char *find_command_path(char *cmd, char **envp)
 	free_array(paths);
 	return (NULL);
 }
-
-// static int execute_external(t_ast *ast, t_shell *shell)
-// {
-// 	pid_t	pid;
-// 	int		status;
-// 	char	*cmd_path;
-// 	int		sig;
-
-// 	status = 0;
-// 	pid = fork();
-// 	if (pid == -1)
-// 		return (1);
-// 	if (pid == 0)  // CHILD PROCESS
-// 	{
-// 		signal(SIGINT, SIG_DFL);
-// 		signal(SIGQUIT, SIG_DFL);
-// 		cmd_path = find_command_path(ast->argv[0], shell->envp);
-// 		if (!cmd_path)
-// 		{
-// 			ft_putstr_fd(ast->argv[0], 2);
-// 			ft_putstr_fd(": command not found\n", 2);
-// 			cleanup_shell(shell);
-// 			exit(127);
-// 		}
-
-// 		// execve() replaces the process - it doesn't return on success
-// 		execve(cmd_path, ast->argv, shell->envp);
-
-// 		// If we get here, execve failed
-// 		perror(ast->argv[0]);
-// 		free(cmd_path);
-// 		cleanup_shell(shell);
-		
-// 		exit(126);
-// 	}
-
-// 	// PARENT PROCESS - wait for child and get exit status
-// 	waitpid(pid, &status, 0);
-// 	if (WIFEXITED(status))
-// 	{
-// 		// close(STDIN_FILENO);
-// 		return (WEXITSTATUS(status));
-// 	}
-// 	else if (WIFSIGNALED(status))
-// 	{
-// 		sig = WTERMSIG(status);
-// 		if (sig == SIGINT)
-// 			return (write(1, "\n", 1), 130);
-// 		// printf("returning 130 here\n");
-// 		return(128 + WTERMSIG(status));
-// 	}
-// 	return (1);
-// }
 
 static int execute_external(t_ast *ast, t_shell *shell)
 {

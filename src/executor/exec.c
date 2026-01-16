@@ -3,46 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ksng <ksng@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: jotong <jotong@student.42singapore.sg>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 15:44:48 by ksng              #+#    #+#             */
-/*   Updated: 2025/11/18 22:42:11 by ksng             ###   ########.fr       */
+/*   Updated: 2026/01/16 10:18:10 by jotong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 #include "libft.h"
-
-/* ************************************************************************** */
-/*                           CONTEXT MANAGEMENT                               */
-/* ************************************************************************** */
-
-
-// static void	backup_fds(t_shell *shell)
-// {
-// 	shell->stdin_backup = dup(STDIN_FILENO);
-// 	shell->stdout_backup = dup(STDOUT_FILENO);
-// }
-
-// static void	restore_fds(t_shell *shell)
-// {
-// 	if (shell->stdin_backup != -1)
-// 	{
-// 		dup2(shell->stdin_backup, STDIN_FILENO);
-// 		close(shell->stdin_backup);
-// 		shell->stdin_backup = -1;
-// 	}
-// 	if (shell->stdout_backup != -1)
-// 	{
-// 		dup2(shell->stdout_backup, STDOUT_FILENO);
-// 		close(shell->stdout_backup);
-// 		shell->stdout_backup = -1;
-// 	}
-// }
-
-/* ************************************************************************** */
-/*                           FORWARD DECLARATIONS                             */
-/* ************************************************************************** */
 
 int	execute_node(t_ast *node, t_shell *shell);
 int	execute_cmd(t_ast *node, t_shell *shell);
