@@ -3,18 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   parser_cmd_redirect_new.c                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ksng <ksng@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: jotong <jotong@student.42singapore.sg>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 16:54:39 by ksng              #+#    #+#             */
-/*   Updated: 2026/01/13 19:57:25 by ksng             ###   ########.fr       */
+/*   Updated: 2026/01/16 12:06:18 by jotong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 #include "libft.h"
-
-//parse_command
-
 
 t_ast *parser_word(t_parser *p)
 {
@@ -34,7 +31,7 @@ t_ast *parser_word(t_parser *p)
 	i = 0;
 	while (i < word_count)
 	{
-		node->argv[i] = p->current->value; // node->argv[i] = ft_strdup(p->current->value);
+		node->argv[i] = p->current->value;
 		p->current->value = NULL;
 		if (!node->argv[i])
 			return (free_ast(node), NULL);
@@ -66,8 +63,6 @@ t_ast	*parse_command(t_parser *p, t_shell *shell)
 		return (parser_word(p));
 	return (NULL);
 }
-
-//parse_redir
 
 char	*strip_quotes(const char *str, int *flag)
 {
@@ -164,7 +159,6 @@ t_ast *parse_one_redir(t_parser *p, t_ast *cmd, t_shell *shell)
         node = create_redir_node(redir_type, file_token->value, cmd, fd);
         if (node)
         {
-            /* Fork to read heredoc */
             if (pipe(pipefd) == -1)
             {
                 free_ast(node);
@@ -178,7 +172,7 @@ t_ast *parse_one_redir(t_parser *p, t_ast *cmd, t_shell *shell)
                 free_ast(node);
                 return (NULL);
             }
-            if (pid == 0)  /* CHILD */
+            if (pid == 0)
             {
                 close(pipefd[0]);
                 char *content = read_heredoc_content(file_token->value);
@@ -193,13 +187,11 @@ t_ast *parse_one_redir(t_parser *p, t_ast *cmd, t_shell *shell)
 				close(STDERR_FILENO);
                 exit(0);
             }
-            /* PARENT */
             close(pipefd[1]);
-            sigaction(SIGINT, NULL, &sa_old);  /* Save current handler */
-            signal(SIGINT, SIG_IGN);  /* Ignore while waiting */
+            sigaction(SIGINT, NULL, &sa_old);
+            signal(SIGINT, SIG_IGN);
             waitpid(pid, &status, 0);
-            sigaction(SIGINT, &sa_old, NULL);  /* Restore saved handler */
-            /* If child was killed (Ctrl+C), return NULL */
+            sigaction(SIGINT, &sa_old, NULL);
             if (WIFEXITED(status) && WEXITSTATUS(status) == 1)
             {
                 close(pipefd[0]);
@@ -207,7 +199,6 @@ t_ast *parse_one_redir(t_parser *p, t_ast *cmd, t_shell *shell)
                 g_sigint_received = 130;
                 return (NULL);
             }
-            /* Read heredoc content from pipe */
             heredoc_content = ft_strdup("");
             while ((n = read(pipefd[0], buffer, sizeof(buffer) - 1)) > 0)
             {
@@ -218,7 +209,6 @@ t_ast *parse_one_redir(t_parser *p, t_ast *cmd, t_shell *shell)
             }
             close(pipefd[0]);
             node->heredoc_content = heredoc_content;
-            /* If heredoc reading was interrupted by signal, stop parsing */
             if (!node->heredoc_content && g_sigint_received)
             {
 				free_ast(node);

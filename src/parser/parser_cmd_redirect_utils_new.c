@@ -6,7 +6,7 @@
 /*   By: jotong <jotong@student.42singapore.sg>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 16:56:13 by ksng              #+#    #+#             */
-/*   Updated: 2026/01/07 21:44:17 by jotong           ###   ########.fr       */
+/*   Updated: 2026/01/16 12:17:36 by jotong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,11 +40,8 @@ int	count_words(t_parser *p)
 	tmp = p->current;
 	while (tmp)
     {
-        // Skip spaces
         while (tmp && tmp->type == T_SPACE)
             tmp = tmp->next;
-
-        // Count word
         if (tmp && tmp->type == T_WORD)
         {
             count++;
@@ -60,83 +57,75 @@ static void sigint_heredoc(int sig, siginfo_t *info, void *context)
 {
     (void)context;
     (void)info;
-    // g_sigint_received = 130;
     if (sig == SIGINT)
     {
         write(1, "\n", 1);
-        // rl_on_new_line();
-        // rl_replace_line("", 0);
-        // rl_redisplay();
         g_sigint_received = 130;
         close(STDIN_FILENO);
     }
 }
 
-// char	*read_heredoc_content(char *delimiter)
-// {
-// 	char	*line;
-// 	char	*content;
-// 	char	*tmp;
-
-// 	content = ft_strdup("");
-// 	while (1)
-// 	{
-// 		line = readline("> ");
-// 		if (!line || ft_strcmp(line, delimiter) == 0)
-// 		{
-// 			free(line);
-// 			break ;
-// 		}
-// 		tmp = content;
-// 		content = ft_strjoin(content, line);
-// 		free(tmp);
-// 		tmp = content;
-// 		content = ft_strjoin(content, "\n");
-// 		free(tmp);
-// 		free(line);
-// 	}
-// 	return (content);
-// }
-
-char    *read_heredoc_content(char *delimiter)
+static void setup_sigact_heredoc(char **content)
 {
-    char    *line;
-    char    *content;
-    char    *tmp;
-    struct sigaction    sa;
+    struct sigaction sa;
+
     ft_bzero(&sa, sizeof(sa));
     sa.sa_sigaction = sigint_heredoc;
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = SA_SIGINFO;
-    // signal(SIGQUIT, SIG_IGN);
     if (sigaction(SIGINT, &sa, NULL) == -1)
     {
         perror("sigaction failed");
         exit(EXIT_FAILURE);
     }
-    content = ft_strdup("");
-    while (1)
-    {
-        line = readline("> ");
-         if (g_sigint_received == 130)
-        {
-            free(line);
-            free(content);
-            exit(1);  /* Exit with code 1 */
-        }
-        if (!line || ft_strcmp(line, delimiter) == 0)
-        {
-            free(line);
-            break ;
-        }
-        tmp = content;
-        content = ft_strjoin(content, line);
-        free(tmp);
-        tmp = content;
-        content = ft_strjoin(content, "\n");
-        free(tmp);
-        free(line);
-    }
-    // set_signals();
-    return (content);
+    *content = ft_strdup("");
+}
+
+static void	handle_sigint_heredoc(char *line, char *content)
+{
+	free(line);
+	free(content);
+	exit(1);
+}
+
+static int	check_heredoc_end(char *line, char *delimiter)
+{
+	if (!line || ft_strcmp(line, delimiter) == 0)
+	{
+		free(line);
+		return (1);
+	}
+	return (0);
+}
+
+static char	*append_line_to_content(char *content, char *line)
+{
+	char	*tmp;
+
+	tmp = content;
+	content = ft_strjoin(content, line);
+	free(tmp);
+	tmp = content;
+	content = ft_strjoin(content, "\n");
+	free(tmp);
+	return (content);
+}
+
+char	*read_heredoc_content(char *delimiter)
+{
+	char	*line;
+	char	*content;
+
+	setup_sigact_heredoc(&content);
+	while (1)
+	{
+		line = readline("> ");
+		if (g_sigint_received == 130)
+			handle_sigint_heredoc(line, content);
+		if (check_heredoc_end(line, delimiter))
+			break ;
+		content = append_line_to_content(content, line);
+		free(line);
+	}
+	return (content);
 }

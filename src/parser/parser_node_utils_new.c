@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser_node_utils_new.c                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ksng <ksng@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: jotong <jotong@student.42singapore.sg>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/11/14 17:39:56 by ksng              #+#    #+#             */
-/*   Updated: 2025/12/12 20:44:18 by ksng             ###   ########.fr       */
+/*   Created: 2026/01/16 12:24:56 by jotong            #+#    #+#             */
+/*   Updated: 2026/01/16 12:25:13 by jotong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,8 @@ t_ast	*create_binary_node(t_node_type type, t_ast *left, t_ast *right)
 	return (node);
 }
 
-t_ast	*create_redir_node(t_node_type type, char *filename, t_ast *cmd, int fd)
+t_ast	*create_redir_node(t_node_type type, char *filename,
+				t_ast *cmd, int fd)
 {
 	t_ast	*node;
 
@@ -70,7 +71,7 @@ t_ast	*create_redir_node(t_node_type type, char *filename, t_ast *cmd, int fd)
 
 t_ast	*new_ast(t_node_type type)
 {
-	t_ast *ast;
+	t_ast	*ast;
 
 	ast = ft_calloc(1, sizeof(t_ast));
 	ast->type = type;
@@ -78,34 +79,27 @@ t_ast	*new_ast(t_node_type type)
 	return (ast);
 }
 
-void free_ast(t_ast *node)
+void	free_ast(t_ast *node)
 {
-    int i;
+	int	i;
 
-    if (!node)
-        return;
-
-    // First, recursively free children (DO THIS FIRST!)
-    free_ast(node->left);
-    free_ast(node->right);
-
-    // Then free the node's data
-    if (node->argv)
-    {
-        i = 0;
-        while (node->argv[i])
-        {
-            free(node->argv[i]);
-            i++;
-        }
-        free(node->argv);
-    }
+	if (!node)
+		return ;
+	free_ast(node->left);
+	free_ast(node->right);
+	if (node->argv)
+	{
+		i = 0;
+		while (node->argv[i])
+		{
+			free(node->argv[i]);
+			i++;
+		}
+		free(node->argv);
+	}
 	if (node->filename)
 		free(node->filename);
 	if (node->heredoc_content)
 		free(node->heredoc_content);
-    // Finally, free the node itself (DO THIS LAST!)
-    free(node);
-
-    // DON'T access node after this point!
+	free (node);
 }
