@@ -28,7 +28,6 @@ int	is_file_descriptor(const char *str)
 	return (1);
 }
 
-
 int	setup_redir_append(t_ast *node, t_shell *shell)
 {
 	int	fd;

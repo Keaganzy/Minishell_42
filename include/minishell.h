@@ -210,39 +210,43 @@ char			*get_env_value(char *var_name, t_shell *shell);
 size_t			get_var_len(char *s);
 void			init_quote_state(t_quote_state *state);
 char			**get_matches(char *pattern);
-int				add_dir_match(char **matches, int *count, char *dname, char *name);
+int				add_dir_match(char **matches, int *count,
+					char *dname, char *name);
 int				add_match(char **matches, int *count, char *name);
 int				match_pattern(char *str, char *pattern);
 char			*join_matches(char **matches);
-size_t	calc_var_len_helper(char *s, t_shell *shell, int *need_free);
-size_t	calc_len(char *s, t_shell *shell);
-int		exp_tilde(char **s, t_exp *e, t_shell *shell);
-int		exp_var(char **s, t_exp *e, t_shell *shell);
-int             expand_process_char(char **s, t_exp *e, t_shell *shell);
-char	*expand_strip(char *s, t_shell *shell, char **map_out);
-size_t	calc_split_len(char *s, char *map);
-char	*split_words(char *s, char *map);
-int		has_wildcard(char *s, char *map, int start, int end);
-int		word_end(char *s, int i);
-char	*trim_pattern(char *pattern);
-char	**get_matches_in_dir(char *dname, char *pattern);
-void	free_matches(char **matches);
-char	*expand_pattern(char *pattern);
-size_t	calc_wild_len(char *s, char *map);
-char	*expand_wild(char *s, char *map);
-char	*expand_and_replace(char **s, t_shell *shell);
-char	*split_words(char *s, char *map);
-void	do_split_words(char *s, char *map, char *result);
-char	*split_words_exec(char *s, char *map);
-void	copy_word(char *s, char *map, int *i, t_copy_state *cs);
-int	exp_var(char **s, t_exp *e, t_shell *shell);
-int	exp_var_single(char **s, t_exp *e, size_t len);
-void	process_calc_len_char(char **s, size_t *len, t_quote_state *state, t_calc_len_params *p);
-int		exec_builtin_part1(char *cmd, int len, t_ast *ast, t_shell *shell);
-int		exec_builtin_part2(char *cmd, int len, t_ast *ast, t_shell *shell);
-void	execute_external_child(t_ast *ast, t_shell *shell);
-int		handle_wait_status(int status);
-char	*find_command_path(char *cmd, char **envp);
+size_t			calc_var_len_helper(char *s, t_shell *shell, int *need_free);
+size_t			calc_len(char *s, t_shell *shell);
+int				exp_tilde(char **s, t_exp *e, t_shell *shell);
+int				exp_var(char **s, t_exp *e, t_shell *shell);
+int				expand_process_char(char **s, t_exp *e, t_shell *shell);
+char			*expand_strip(char *s, t_shell *shell, char **map_out);
+size_t			calc_split_len(char *s, char *map);
+char			*split_words(char *s, char *map);
+int				has_wildcard(char *s, char *map, int start, int end);
+int				word_end(char *s, int i);
+char			*trim_pattern(char *pattern);
+char			**get_matches_in_dir(char *dname, char *pattern);
+void			free_matches(char **matches);
+char			*expand_pattern(char *pattern);
+size_t			calc_wild_len(char *s, char *map);
+char			*expand_wild(char *s, char *map);
+char			*expand_and_replace(char **s, t_shell *shell);
+char			*split_words(char *s, char *map);
+void			do_split_words(char *s, char *map, char *result);
+char			*split_words_exec(char *s, char *map);
+void			copy_word(char *s, char *map, int *i, t_copy_state *cs);
+int				exp_var(char **s, t_exp *e, t_shell *shell);
+int				exp_var_single(char **s, t_exp *e, size_t len);
+void			process_calc_len_char(char **s, size_t *len,
+					t_quote_state *state, t_calc_len_params *p);
+int				exec_builtin_part1(char *cmd, int len, t_ast *ast,
+					t_shell *shell);
+int				exec_builtin_part2(char *cmd, int len, t_ast *ast,
+					t_shell *shell);
+void			execute_external_child(t_ast *ast, t_shell *shell);
+int				handle_wait_status(int status);
+char			*find_command_path(char *cmd, char **envp);
 
 /* Builtins Module */
 void			free_substr(char **substr);
@@ -299,24 +303,25 @@ t_ast			*new_ast(t_node_type type);
 void			free_ast(t_ast *node);
 t_ast			*parser_word(t_parser *p);
 t_node_type		get_redir_type(t_token_type type);
-void	handle_sigint_heredoc(char *line, char *content);
-int	check_heredoc_end(char *line, char *delimiter);
-char	*append_line_to_content(char *content, char *line);
-char	*read_heredoc_content(char *delimiter);
-void	setup_sigact_heredoc(char **content);
-char	*strip_quotes(const char *str, int *flag);
-int		validate_redir_token(t_parser *p, t_ast *cmd, t_shell *shell);
-t_token	*get_file_token(t_parser *p, t_ast *cmd, t_shell *shell);
-t_ast	*handle_heredoc(t_node_type type, t_token *file_token,
-t_ast *cmd, t_shell *shell);
-t_ast	*parse_prefix_redirections(t_parser *p, t_shell *shell);
-t_ast	*parse_suffix_redirections(t_parser *p, t_ast *cmd, t_shell *shell);
-t_ast	*find_bottom_left(t_ast *cmd);
-t_ast	*attach_command_to_redir(t_parser *p, t_ast *cmd, t_shell *shell);
-t_ast	*handle_command_parse(t_parser *p, t_ast *cmd, t_shell *shell);
-t_ast	*handle_no_command(t_ast *cmd, t_shell *shell);
-t_ast	*parse_redirection(t_parser *p, t_shell *shell);
-
+void			handle_sigint_heredoc(char *line, char *content);
+int				check_heredoc_end(char *line, char *delimiter);
+char			*append_line_to_content(char *content, char *line);
+char			*read_heredoc_content(char *delimiter);
+void			setup_sigact_heredoc(char **content);
+char			*strip_quotes(const char *str, int *flag);
+int				validate_redir_token(t_parser *p, t_ast *cmd, t_shell *shell);
+t_token			*get_file_token(t_parser *p, t_ast *cmd, t_shell *shell);
+t_ast			*handle_heredoc(t_node_type type, t_token *file_token,
+					t_ast *cmd, t_shell *shell);
+t_ast			*parse_prefix_redirections(t_parser *p, t_shell *shell);
+t_ast			*parse_suffix_redirections(t_parser *p, t_ast *cmd,
+					t_shell *shell);
+t_ast			*find_bottom_left(t_ast *cmd);
+t_ast			*attach_command_to_redir(t_parser *p, t_ast *cmd,
+					t_shell *shell);
+t_ast			*handle_command_parse(t_parser *p, t_ast *cmd, t_shell *shell);
+t_ast			*handle_no_command(t_ast *cmd, t_shell *shell);
+t_ast			*parse_redirection(t_parser *p, t_shell *shell);
 
 /* Shell Utils */
 char			**cleanup_dup_envp(t_shell *shell, int index);

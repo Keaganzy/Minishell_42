@@ -12,7 +12,7 @@
 
 #include "minishell.h"
 
-char **cleanup_dup_envp(t_shell *shell, int index)
+char	**cleanup_dup_envp(t_shell *shell, int index)
 {
 	int		i;
 	char	**duped_env;

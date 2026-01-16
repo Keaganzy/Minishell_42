@@ -58,9 +58,7 @@ static int	process_line(char *line, t_shell *shell)
 		return (0);
 	}
 	shell->tokens = tokens;
-	// print_token_stream_colored(tokens);
 	shell->ast = parse(tokens, shell);
-	// print_ast(shell->ast);
 	if (shell->ast)
 		execute_ast(shell->ast, shell);
 	if (shell->ast)
@@ -106,3 +104,6 @@ int	main(int argc, char **argv, char **envp)
 	cleanup_shell(shell);
 	return (final_exit_status);
 }
+
+// print_token_stream_colored(tokens); line 61
+// print_ast(shell->ast); line 63
