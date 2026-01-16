@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor_utils.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ksng <ksng@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: jotong <jotong@student.42singapore.sg>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/19 23:15:23 by jotong            #+#    #+#             */
-/*   Updated: 2026/01/13 17:13:26 by ksng             ###   ########.fr       */
+/*   Updated: 2026/01/16 10:25:43 by jotong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,6 @@ int	setup_redir_out(t_ast *node, t_shell *shell)
 {
 	int fd;
 
-	//jtfunction(filename);//
 	node->filename = expand_and_replace(&node->filename, shell);
 
 	if (node->filename && is_file_descriptor(node->filename) && node->fd != 1)
@@ -86,7 +85,6 @@ int	setup_redir_out(t_ast *node, t_shell *shell)
 			return (1);
 		return (0);
 	}
-
 	fd = open(node->filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (fd == -1)
 	{
@@ -102,7 +100,6 @@ int	setup_redir_append(t_ast *node, t_shell *shell)
 {
 	int fd;
 
-	//jtfunction(filename);//
 	node->filename = expand_and_replace(&node->filename, shell);
 
 	if (node->filename && is_file_descriptor(node->filename) && node->fd != 1)
@@ -112,7 +109,6 @@ int	setup_redir_append(t_ast *node, t_shell *shell)
 			return (1);
 		return (0);
 	}
-
 	fd = open(node->filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
 	if (fd == -1)
 	{
@@ -134,13 +130,8 @@ int	setup_heredoc(t_ast *node, t_shell *shell)
 
 	if (pipe(pipefd) == -1)
 		return (1);
-	//jtfunction(node->heredoc_content);//
-	//node->heredoc_content = expand_and_replace(&(node->heredoc_content), shell);
-	// Write pre-read content to pipe
 	write(pipefd[1], node->heredoc_content, ft_strlen(node->heredoc_content));
 	close(pipefd[1]);
-
-	// Redirect stdin to pipe
 	dup2(pipefd[0], STDIN_FILENO);
 	close(pipefd[0]);
 

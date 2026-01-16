@@ -6,7 +6,7 @@
 /*   By: jotong <jotong@student.42singapore.sg>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 20:56:01 by ksng              #+#    #+#             */
-/*   Updated: 2026/01/07 22:51:35 by jotong           ###   ########.fr       */
+/*   Updated: 2026/01/16 10:26:51 by jotong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,6 @@ static int setup_rechain(t_ast *node, t_shell *shell)
 	if (!node)
 		return (0);
 	if (node->left && (node->left->type == N_REDIR_IN || node->left->type == N_REDIR_OUT || node->left->type == N_REDIR_APPEND || node->left->type == N_HEREDOC))
-	//if (node->left && (node->left->type == node->type))
 	{
 		status = setup_rechain(node->left, shell);
 		if (status != 0)
@@ -86,7 +85,6 @@ int	execute_redir(t_ast *node, t_shell *shell)
 		return (status);
 	}
 	cmd = node;
-	// while (cmd && peek_ast(cmd->left) && cmd->type == cmd->left->type)
 	while (cmd && (cmd->type == N_REDIR_IN || cmd->type == N_REDIR_OUT || cmd->type == N_REDIR_APPEND || cmd->type == N_HEREDOC))
 	{
 		cmd = cmd->left;
